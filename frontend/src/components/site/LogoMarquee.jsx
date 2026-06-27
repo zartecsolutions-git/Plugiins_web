@@ -1,27 +1,14 @@
 import React from "react";
 
-const LOGOS = [
-  "STELLAR LABS",
-  "NORDIC GO",
-  "RAVENWORKS",
-  "ARCWAVE",
-  "HYDRA / OS",
-  "PIVOTAL",
-  "MERIDIAN",
-  "FORGE & SONS",
-  "OBLIQ",
-  "VANTAGE",
-];
-
-export const LogoMarquee = () => {
-  const items = [...LOGOS, ...LOGOS];
+export const LogoMarquee = ({ logos = [] }) => {
+  const items = [...logos, ...logos];
   return (
     <section
       data-testid="logo-marquee"
       className="border-y border-white/[0.05] bg-[#060606] py-10 overflow-hidden"
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-8 mb-6 flex items-center justify-between">
-        <span className="label-mono">/ Trusted by builders & teams</span>
+        <span className="label-mono">/ Trusted by founders &amp; teams</span>
         <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-zinc-600">
           Across 38 countries
         </span>

@@ -1,0 +1,45 @@
+{
+  "summary": "Iteration 2 — software-agency pivot + admin CMS. Backend: 15/15 pytest tests pass (health, content, leads, auth, admin protected). Frontend: public landing renders all 9 sections (Hero, LogoMarquee, HowItWorks, Features, Industries, Testimonials, FAQ, CTA, Footer); NO pricing section anywhere; hero copy matches agency framing ('We turn your business idea into shipping software', 'Software Solutions Studio'); CTA form happy-path and validation work. Admin login (good + bad creds), JWT in localStorage 'plg_token', all 10 admin tabs render, hero-eyebrow edit -> save -> public reflects -> revert works, industries add/remove works, leads list + delete works, logout clears token, /admin protection redirect works, /nope 404 page renders with data-testid='404-home-link'.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "POST /api/leads success", "issue": "Returns 200 instead of 201 on creation; convention is 201 for POST create. Functional but inconsistent."},
+      {"endpoint": "GET /api/admin/leads", "issue": "limit query uses raw HTTPException(400) for out-of-range. FastAPI Query(ge=1, le=1000) would return 422 and document the constraint."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "AdminLogin", "issues": ["Field selectors are 'admin-login-email' / 'admin-login-password' but original spec mentioned generic 'admin-email-input' style. Either is fine, but worth confirming docs. (No functional issue.)"]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/backend_test.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "(Optional) Return 201 for POST /api/leads and POST /api/status; align with REST convention.",
+    "(Optional) Convert admin-leads `limit` to Query(ge=1, le=1000) so OpenAPI docs and 422 responses are consistent."
+  ],
+  "critical_code_review_comments": [
+    "server.py — admin auth implemented cleanly with HTTPBearer + JWT (HS256) and idempotent admin seed (also rotates hash if password env changed). Good.",
+    "Excludes _id everywhere via projection {_id:0} — good.",
+    "PUT /api/admin/content replaces the document fully via $set on payload; if a client omits a key, the previous value is preserved (because $set only updates provided fields). This is safe but mildly surprising — consider documenting that PATCH-semantics are in effect, or implement a real replace. Not a bug.",
+    "No rate-limit/brute-force lockout on /api/auth/login (not required by spec, but a good hardening note for a CMS endpoint).",
+    "JWT_SECRET is committed to .env (env file is local-only). Fine for preview.",
+    "Frontend AdminDashboard.jsx has admin-save & admin-tab-* and ind-items-add/remove-N test ids — all align with spec.",
+    "Footer test id is 'site-footer' (not 'footer') and process section is 'how-it-works-section' (not 'process-section'). Spec used generic names; tests confirm functional sections exist."
+  ],
+  "updated_files": [
+    "/app/backend/tests/backend_test.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "success_rate": {"backend": "100% (15/15)", "frontend": "100%"},
+  "test_credentials": "webadmin@plugiins.com / plugiins@2026 (from /app/memory/test_credentials.md)",
+  "seed_data_creation": "Created several TEST_*@example.com leads via POST /api/leads during pytest and one TEST_pw_iter2@example.com lead via the public CTA form. Most TEST leads were cleaned up by the admin DELETE flow; a few may remain in db.leads.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Backend health, content, auth and admin endpoints all green. AdminLogin test ids are 'admin-login-email', 'admin-login-password', 'admin-login-submit', 'admin-login-error'. AdminDashboard uses 'admin-tab-<key>' for tabs, 'admin-save' to persist, 'admin-logout' to clear token, 'ind-items-add' / 'ind-items-remove-N' for arrays, and 'lead-delete-{id}' to remove a lead. JWT is in localStorage key 'plg_token'. The Hero section uses 'hero-section', process uses 'how-it-works-section', footer uses 'site-footer'. CTA submit button is 'cta-submit-button'. No pricing UI anywhere. Hero copy: 'We turn your business idea into shipping software' + eyebrow 'Software Solutions Studio'.",
+  "rca of the issue": "n/a - no functional bugs found"
+}

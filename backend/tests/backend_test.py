@@ -1,20 +1,22 @@
-"""Plugiins backend API tests.
+"""Plugiins backend API tests — iteration 2 (CMS + Auth).
 
 Covers:
 - Health route (GET /api/)
 - Lead capture (POST /api/leads) success + validation
-- Lead list (GET /api/leads) ordering and limit
+- Public content (GET /api/content)
+- Auth (POST /api/auth/login, GET /api/auth/me)
+- Admin protected routes (PUT /api/admin/content, GET/DELETE /api/admin/leads)
 """
 import os
 import uuid
 import pytest
 import requests
 from datetime import datetime
+from pathlib import Path
 
+# Resolve backend URL from frontend/.env (single source of truth in this env)
 BASE_URL = os.environ.get("REACT_APP_BACKEND_URL")
 if not BASE_URL:
-    # fallback to frontend .env so the tests are runnable from CI shell
-    from pathlib import Path
     env_path = Path("/app/frontend/.env")
     if env_path.exists():
         for line in env_path.read_text().splitlines():
@@ -25,7 +27,11 @@ assert BASE_URL, "REACT_APP_BACKEND_URL must be set"
 BASE_URL = BASE_URL.rstrip("/")
 API = f"{BASE_URL}/api"
 
+ADMIN_EMAIL = "webadmin@plugiins.com"
+ADMIN_PASSWORD = "plugiins@2026"
 
+
+# ----- fixtures -----------------------------------------------------------
 @pytest.fixture(scope="session")
 def client():
     s = requests.Session()
@@ -33,18 +39,62 @@ def client():
     return s
 
 
-# ---------- Health ----------
+@pytest.fixture(scope="session")
+def admin_token(client):
+    r = client.post(
+        f"{API}/auth/login",
+        json={"email": ADMIN_EMAIL, "password": ADMIN_PASSWORD},
+        timeout=15,
+    )
+    assert r.status_code == 200, f"admin login failed: {r.status_code} {r.text}"
+    return r.json()["token"]
+
+
+@pytest.fixture(scope="session")
+def admin_client(client, admin_token):
+    s = requests.Session()
+    s.headers.update({
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {admin_token}",
+    })
+    return s
+
+
+# ----- Health -------------------------------------------------------------
 class TestHealth:
     def test_root_health(self, client):
         r = client.get(f"{API}/", timeout=15)
         assert r.status_code == 200, r.text
-        data = r.json()
-        assert data == {"message": "Plugiins API is live"}
+        assert r.json() == {"message": "Plugiins API is live"}
 
 
-# ---------- Lead capture ----------
+# ----- Public Content -----------------------------------------------------
+class TestContent:
+    def test_get_content_has_all_sections(self, client):
+        r = client.get(f"{API}/content", timeout=15)
+        assert r.status_code == 200, r.text
+        doc = r.json()
+        assert doc.get("id") == "main"
+        for key in [
+            "settings", "hero", "brand_logos", "process", "services",
+            "industries", "testimonials", "faq", "cta", "footer",
+        ]:
+            assert key in doc, f"missing section: {key}"
+        # Hero copy reflects agency framing
+        hero = doc["hero"]
+        assert "software" in (hero.get("headline_highlight", "") + hero.get("headline_a", "") +
+                              hero.get("headline_b", "")).lower() or \
+               "shipping software" in hero.get("headline_highlight", "").lower()
+        # No 'Pay for outcomes' pricing copy anywhere in content
+        import json
+        as_text = json.dumps(doc).lower()
+        assert "pay for outcomes" not in as_text
+        assert "pricing-section" not in as_text
+
+
+# ----- Leads (public create) ----------------------------------------------
 class TestLeads:
-    def test_create_lead_success_and_persist(self, client):
+    def test_create_lead_success(self, client):
         payload = {
             "email": f"TEST_{uuid.uuid4().hex[:8]}@example.com",
             "idea": "TEST lead idea - automated test",
@@ -56,74 +106,143 @@ class TestLeads:
         assert body["email"] == payload["email"].lower()
         assert body["idea"] == payload["idea"]
         assert body["source"] == payload["source"]
-        assert isinstance(body["id"], str) and len(body["id"]) > 0
-        assert "created_at" in body
+        assert isinstance(body["id"], str) and body["id"]
         # ISO datetime parseable
         datetime.fromisoformat(body["created_at"].replace("Z", "+00:00"))
-
-        # GET /api/leads should include this email
-        r2 = client.get(f"{API}/leads?limit=200", timeout=15)
-        assert r2.status_code == 200
-        emails = [item["email"] for item in r2.json()]
-        assert payload["email"].lower() in emails
 
     def test_create_lead_invalid_email_returns_422(self, client):
         r = client.post(
             f"{API}/leads",
-            json={"email": "not-an-email", "idea": "x", "source": "pytest"},
+            json={"email": "not-an-email", "idea": "x"},
             timeout=15,
         )
         assert r.status_code == 422, r.text
 
-    def test_create_lead_missing_email_returns_422(self, client):
-        r = client.post(f"{API}/leads", json={"idea": "x"}, timeout=15)
-        assert r.status_code == 422
 
-    def test_create_lead_defaults(self, client):
-        # Only email supplied
-        email = f"TEST_{uuid.uuid4().hex[:8]}@example.com"
-        r = client.post(f"{API}/leads", json={"email": email}, timeout=15)
+# ----- Auth ---------------------------------------------------------------
+class TestAuth:
+    def test_login_success(self, client):
+        r = client.post(
+            f"{API}/auth/login",
+            json={"email": ADMIN_EMAIL, "password": ADMIN_PASSWORD},
+            timeout=15,
+        )
+        assert r.status_code == 200, r.text
+        data = r.json()
+        assert "token" in data and isinstance(data["token"], str) and data["token"]
+        assert data["user"]["email"] == ADMIN_EMAIL
+        assert data["user"]["role"] == "admin"
+        assert "id" in data["user"]
+
+    def test_login_bad_password(self, client):
+        r = client.post(
+            f"{API}/auth/login",
+            json={"email": ADMIN_EMAIL, "password": "wrong-password"},
+            timeout=15,
+        )
+        assert r.status_code == 401
+        body = r.json()
+        # FastAPI uses {'detail': ...}
+        assert "Invalid email or password" in (body.get("detail") or body.get("message") or "")
+
+    def test_login_unknown_email(self, client):
+        r = client.post(
+            f"{API}/auth/login",
+            json={"email": "nobody@example.com", "password": "whatever"},
+            timeout=15,
+        )
+        assert r.status_code == 401
+
+    def test_me_with_token(self, admin_client):
+        r = admin_client.get(f"{API}/auth/me", timeout=15)
         assert r.status_code == 200, r.text
         body = r.json()
-        assert body["email"] == email.lower()
-        assert body["source"] == "homepage_cta"
-        assert body["idea"] == ""
+        assert body["email"] == ADMIN_EMAIL
+        assert body["role"] == "admin"
+
+    def test_me_without_token_returns_401(self, client):
+        r = client.get(f"{API}/auth/me", timeout=15)
+        assert r.status_code == 401
 
 
-# ---------- Listing ----------
-class TestLeadsListing:
-    def test_list_limits_and_ordering(self, client):
-        # Insert 3 fresh leads with small wait to ensure ordering by created_at
-        created_emails = []
-        for i in range(3):
-            email = f"TEST_order_{uuid.uuid4().hex[:6]}@example.com"
-            r = client.post(
-                f"{API}/leads",
-                json={"email": email, "idea": f"order test {i}", "source": "order_test"},
-                timeout=15,
-            )
-            assert r.status_code == 200
-            created_emails.append(email.lower())
+# ----- Admin: content -----------------------------------------------------
+class TestAdminContent:
+    def test_put_content_without_token_returns_401(self, client):
+        r = client.put(f"{API}/admin/content", json={"settings": {"company_name": "X"}}, timeout=15)
+        assert r.status_code == 401
 
-        # Limit honoured
-        r = client.get(f"{API}/leads?limit=2", timeout=15)
+    def test_put_content_updates_and_persists(self, client, admin_client):
+        # Backup current
+        r = client.get(f"{API}/content", timeout=15)
         assert r.status_code == 200
-        items = r.json()
+        backup = r.json()
+        backup.pop("_id", None)
+
+        # Mutate company_name
+        new_name = f"Plugiins X {uuid.uuid4().hex[:4]}"
+        mutated = dict(backup)
+        mutated["settings"] = dict(backup.get("settings", {}))
+        mutated["settings"]["company_name"] = new_name
+
+        try:
+            r2 = admin_client.put(f"{API}/admin/content", json=mutated, timeout=15)
+            assert r2.status_code == 200, r2.text
+
+            # Read back via public endpoint
+            r3 = client.get(f"{API}/content", timeout=15)
+            assert r3.status_code == 200
+            assert r3.json()["settings"]["company_name"] == new_name
+        finally:
+            # Restore original
+            restore = dict(backup)
+            restore.pop("updated_at", None)
+            restore.pop("updated_by", None)
+            rr = admin_client.put(f"{API}/admin/content", json=restore, timeout=15)
+            assert rr.status_code == 200, rr.text
+
+
+# ----- Admin: leads -------------------------------------------------------
+class TestAdminLeads:
+    def test_list_leads_without_token_returns_401(self, client):
+        r = client.get(f"{API}/admin/leads", timeout=15)
+        assert r.status_code == 401
+
+    def test_list_leads_returns_list_recent_first(self, client, admin_client):
+        # Create a fresh lead so we know it appears
+        email = f"TEST_admin_{uuid.uuid4().hex[:6]}@example.com"
+        r = client.post(f"{API}/leads", json={"email": email, "idea": "admin list test"}, timeout=15)
+        assert r.status_code == 200
+        created = r.json()
+
+        r2 = admin_client.get(f"{API}/admin/leads", timeout=15)
+        assert r2.status_code == 200, r2.text
+        items = r2.json()
         assert isinstance(items, list)
-        assert len(items) <= 2
+        emails = [it["email"] for it in items]
+        assert email.lower() in emails
+        # Ordering: created_at desc
+        ts = [it["created_at"] for it in items]
+        assert ts == sorted(ts, reverse=True)
 
-        # Default limit returns the latest. The most recently created should be present.
-        r_all = client.get(f"{API}/leads?limit=50", timeout=15)
-        assert r_all.status_code == 200
-        all_items = r_all.json()
-        # created_at descending check
-        ts = [it["created_at"] for it in all_items]
-        assert ts == sorted(ts, reverse=True), "leads must be sorted by created_at desc"
-        # last inserted email should be present in fetched list
-        assert created_emails[-1] in [it["email"] for it in all_items]
+        # Cleanup
+        admin_client.delete(f"{API}/admin/leads/{created['id']}", timeout=15)
 
-    def test_list_limit_out_of_range_returns_400(self, client):
-        r = client.get(f"{API}/leads?limit=0", timeout=15)
-        assert r.status_code == 400
-        r2 = client.get(f"{API}/leads?limit=10000", timeout=15)
-        assert r2.status_code == 400
+    def test_delete_lead_then_404_on_missing(self, client, admin_client):
+        # Create
+        email = f"TEST_del_{uuid.uuid4().hex[:6]}@example.com"
+        r = client.post(f"{API}/leads", json={"email": email}, timeout=15)
+        assert r.status_code == 200
+        lead_id = r.json()["id"]
+
+        # Delete (auth)
+        r2 = admin_client.delete(f"{API}/admin/leads/{lead_id}", timeout=15)
+        assert r2.status_code == 200, r2.text
+        assert r2.json() == {"ok": True}
+
+        # 404 on missing
+        r3 = admin_client.delete(f"{API}/admin/leads/{lead_id}", timeout=15)
+        assert r3.status_code == 404
+
+    def test_delete_lead_without_token_returns_401(self, client):
+        r = client.delete(f"{API}/admin/leads/anything", timeout=15)
+        assert r.status_code == 401

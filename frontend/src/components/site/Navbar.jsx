@@ -2,14 +2,13 @@ import React, { useEffect, useState } from "react";
 import { List, X, ArrowUpRight } from "@phosphor-icons/react";
 
 const NAV_LINKS = [
-  { label: "Product", href: "#how-it-works" },
-  { label: "Features", href: "#features" },
+  { label: "Studio", href: "#how-it-works" },
+  { label: "Services", href: "#features" },
   { label: "Industries", href: "#industries" },
-  { label: "Pricing", href: "#pricing" },
   { label: "FAQ", href: "#faq" },
 ];
 
-export const Navbar = () => {
+export const Navbar = ({ settings = {} }) => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -18,6 +17,9 @@ export const Navbar = () => {
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  const logo = settings.logo_url ||
+    "https://customer-assets.emergentagent.com/job_ai-plugin-builder-1/artifacts/mermnicj_Plugiins%20.png";
 
   return (
     <header
@@ -29,18 +31,16 @@ export const Navbar = () => {
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-8 h-16 flex items-center justify-between">
-        <a
-          href="#top"
-          data-testid="nav-logo"
-          className="flex items-center gap-2.5 group"
-        >
+        <a href="#top" data-testid="nav-logo" className="flex items-center gap-2.5 group">
           <img
-            src="https://customer-assets.emergentagent.com/job_ai-plugin-builder-1/artifacts/mermnicj_Plugiins%20.png"
+            src={logo}
             alt="Plugiins"
             className="h-9 w-9 object-contain transition-transform duration-500 group-hover:rotate-6"
           />
           <span className="font-display font-semibold text-[17px] tracking-tight">
-            <span className="text-[#1ea7ff]">plug</span><span className="text-[#FF5F15]">iins</span><span className="text-[#FF5F15]">.</span>
+            <span className="text-[#1ea7ff]">plug</span>
+            <span className="text-[#FF5F15]">iins</span>
+            <span className="text-[#FF5F15]">.</span>
           </span>
         </a>
 
@@ -59,18 +59,18 @@ export const Navbar = () => {
 
         <div className="hidden md:flex items-center gap-3">
           <a
-            href="#contact"
+            href="#cta"
             data-testid="nav-cta-talk"
             className="text-[13px] font-body text-zinc-300 hover:text-white transition-colors"
           >
-            Talk to sales
+            Talk to us
           </a>
           <a
             href="#cta"
             data-testid="nav-cta-start"
             className="btn-brand text-[13px] py-2.5 px-4"
           >
-            Build with AI
+            Start a project
             <ArrowUpRight size={14} weight="bold" />
           </a>
         </div>
@@ -101,12 +101,8 @@ export const Navbar = () => {
                 {l.label}
               </a>
             ))}
-            <a
-              href="#cta"
-              onClick={() => setMobileOpen(false)}
-              className="btn-brand mt-2 justify-center"
-            >
-              Build with AI
+            <a href="#cta" onClick={() => setMobileOpen(false)} className="btn-brand mt-2 justify-center">
+              Start a project
             </a>
           </div>
         </div>

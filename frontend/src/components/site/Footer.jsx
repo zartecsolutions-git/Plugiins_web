@@ -1,31 +1,11 @@
 import React from "react";
-import {
-  XLogo,
-  LinkedinLogo,
-  GithubLogo,
-  DiscordLogo,
-} from "@phosphor-icons/react";
+import { XLogo, LinkedinLogo, GithubLogo, DiscordLogo } from "@phosphor-icons/react";
 
-const COLUMNS = [
-  {
-    title: "Product",
-    links: ["Features", "Pricing", "Integrations", "Changelog", "Roadmap"],
-  },
-  {
-    title: "Solutions",
-    links: ["Startups", "Enterprise", "Agencies", "Education", "Government"],
-  },
-  {
-    title: "Company",
-    links: ["About", "Customers", "Careers", "Press", "Contact"],
-  },
-  {
-    title: "Resources",
-    links: ["Docs", "API reference", "Templates", "Community", "Security"],
-  },
-];
+export const Footer = ({ footer = {}, settings = {} }) => {
+  const columns = footer.columns || [];
+  const logo = settings.logo_url ||
+    "https://customer-assets.emergentagent.com/job_ai-plugin-builder-1/artifacts/mermnicj_Plugiins%20.png";
 
-export const Footer = () => {
   return (
     <footer
       id="contact"
@@ -36,18 +16,15 @@ export const Footer = () => {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-10 mb-16">
           <div className="col-span-2 lg:col-span-2">
             <div className="flex items-center gap-2.5 mb-5">
-              <img
-                src="https://customer-assets.emergentagent.com/job_ai-plugin-builder-1/artifacts/mermnicj_Plugiins%20.png"
-                alt="Plugiins"
-                className="h-9 w-9 object-contain"
-              />
+              <img src={logo} alt="Plugiins" className="h-9 w-9 object-contain" />
               <span className="font-display font-semibold text-[17px] tracking-tight text-white">
-                <span className="text-[#1ea7ff]">plug</span><span className="text-[#FF5F15]">iins</span><span className="text-[#FF5F15]">.</span>
+                <span className="text-[#1ea7ff]">plug</span>
+                <span className="text-[#FF5F15]">iins</span>
+                <span className="text-[#FF5F15]">.</span>
               </span>
             </div>
             <p className="font-body text-sm text-zinc-500 leading-relaxed max-w-xs">
-              The AI-native delivery studio for every kind of business. Turn
-              your idea into a shipping product.
+              {footer.tagline}
             </p>
             <div className="mt-6 flex items-center gap-3">
               {[
@@ -69,17 +46,17 @@ export const Footer = () => {
             </div>
           </div>
 
-          {COLUMNS.map((c) => (
-            <div key={c.title}>
+          {columns.map((c, ci) => (
+            <div key={ci}>
               <h4 className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#FF5F15] mb-5">
                 / {c.title}
               </h4>
               <ul className="space-y-3">
-                {c.links.map((l) => (
-                  <li key={l}>
+                {(c.links || []).map((l, li) => (
+                  <li key={li}>
                     <a
                       href="#"
-                      data-testid={`footer-link-${l.toLowerCase().replace(/\s+/g, "-")}`}
+                      data-testid={`footer-link-${c.title.toLowerCase()}-${li}`}
                       className="font-body text-[13px] text-zinc-400 hover:text-white transition-colors"
                     >
                       {l}
@@ -91,14 +68,15 @@ export const Footer = () => {
           ))}
         </div>
 
-        {/* Massive wordmark */}
         <div className="relative overflow-hidden border-t border-white/[0.06] pt-12 mb-10">
           <div
             data-testid="footer-wordmark"
             className="font-display font-semibold tracking-[-0.04em] leading-none select-none"
             style={{ fontSize: "clamp(64px, 16vw, 240px)" }}
           >
-            <span className="text-[#1ea7ff]">plug</span><span className="text-white">iins</span><span className="text-[#FF5F15]">.</span>
+            <span className="text-[#1ea7ff]">plug</span>
+            <span className="text-white">iins</span>
+            <span className="text-[#FF5F15]">.</span>
           </div>
         </div>
 
