@@ -1,0 +1,124 @@
+{
+  "project_name": "plugiins.com",
+  "domain": "AI Technology / SaaS Platform",
+  "theme": "Modern Dark Futuristic",
+  "archetype": "4 (Swiss & High-Contrast) + Dark Mode (Midnight Black & Orange/Amber Accent)",
+  "emotional_tone": "Authoritative, cutting-edge, professional, minimal",
+  "colors": {
+    "background": {
+      "base": "#030303",
+      "surface": "#0C0C0C",
+      "surface_raised": "#141414"
+    },
+    "text": {
+      "primary": "#FAFAFA",
+      "secondary": "#A1A1AA",
+      "muted": "#52525B"
+    },
+    "brand": {
+      "primary": "#FF5F15",
+      "primary_hover": "#FF7A3D",
+      "secondary": "#FFD700"
+    },
+    "borders": {
+      "default": "rgba(255, 255, 255, 0.08)",
+      "highlight": "rgba(255, 95, 21, 0.4)"
+    },
+    "gradients": {
+      "text_highlight": "linear-gradient(to right, #FF5F15, #FFD700)",
+      "surface_glow": "radial-gradient(circle at center, rgba(255, 95, 21, 0.15) 0%, transparent 70%)"
+    }
+  },
+  "typography": {
+    "primary_font": "Outfit",
+    "secondary_font": "Manrope",
+    "mono_font": "JetBrains Mono",
+    "hierarchy": {
+      "h1": "text-5xl sm:text-6xl tracking-tighter font-semibold text-white",
+      "h2": "text-3xl sm:text-4xl tracking-tight font-medium text-white",
+      "h3": "text-xl sm:text-2xl tracking-tight font-medium text-white",
+      "body": "text-base leading-relaxed text-[#A1A1AA] font-secondary",
+      "label": "text-xs tracking-[0.2em] uppercase font-mono text-[#FF5F15]"
+    }
+  },
+  "spacing_and_layout": {
+    "philosophy": "Generous Spacing Philosophy. Use large padding (p-12, p-16) for sections. Elements within borders must have at least p-6 or p-8.",
+    "grid_system": "Bento Grid (Mode A: Tetris Grid) for features and how-it-works. Base grid: grid-cols-1 md:grid-cols-8 lg:grid-cols-12 with gap-8 to gap-12.",
+    "container": "max-w-7xl mx-auto px-6",
+    "alignment": "Left-aligned for textual content, asymmetrical balances."
+  },
+  "surfaces_and_effects": {
+    "navigation": "Glassmorphism (Crystal Glass) - backdrop-blur-xl bg-black/60 with a 1px delicate bottom border (border-white/10). Sticky positioned.",
+    "cards": "Flat solid background (#0C0C0C) with 1px border-white/10. On hover, slight lift and border color shifts to highlight (rgba(255, 95, 21, 0.4)).",
+    "borders": "Grid Borders (The 'Technical' Look) for the features section, exposing the skeleton.",
+    "hero_overlay": "bg-black/40 over the background image to ensure text legibility."
+  },
+  "components_strategy": {
+    "hero": "Bold typography, abstract orange digital background image behind a black/40 overlay. Contains main headline, descriptive subtext, and a high-contrast primary CTA button.",
+    "how_it_works": "Vertical timeline or 4-column minimal bento-box flow with JetBrains Mono numbers (01, 02) indicating steps.",
+    "features_grid": "Bento-grid overlapping elements. Emphasize one large feature (AI Blueprint) and several smaller ones.",
+    "pricing": "3-tier card layout. The 'Pro' tier should use the 'Tracing Beam' effect or a glowing orange border to stand out.",
+    "footer": "Massive typography (text-[10vw]) for the word 'PLUGIINS' or 'LET\\'S BUILD'. Dark base.",
+    "cta": "Solid brand color button (#FF5F15) with text-white, no rounded corners (rounded-none) or very sharp (rounded-sm) to keep the brutalist/technical look."
+  },
+  "motion_and_interactions": {
+    "hover": "Buttons and links must explicitly set hover text/bg color (e.g., hover:bg-[#FF7A3D]).",
+    "cards": "Subtle -translate-y-1 on hover for interactive bento boxes.",
+    "entrance": "Fade up (opacity and slight Y translation) staggered on scroll."
+  },
+  "icons": {
+    "library": "@phosphor-icons/react",
+    "style": "duotone or thin weights to match the sophisticated tech aesthetic."
+  },
+  "media": {
+    "image_urls": [
+      {
+        "category": "hero_background",
+        "url": "https://images.unsplash.com/photo-1489648022186-8f49310909a0",
+        "description": "Orange digital lines converging, great for AI/tech concept"
+      },
+      {
+        "category": "section_background",
+        "url": "https://images.unsplash.com/photo-1708457753320-02e52a276a80",
+        "description": "Dark red/orange abstract geometric curves for feature sections"
+      },
+      {
+        "category": "architecture_vibe",
+        "url": "https://images.pexels.com/photos/18893528/pexels-photo-18893528.jpeg",
+        "description": "Dark architectural corridor for the 'scalable/secure' feature visual"
+      },
+      {
+        "category": "sponsor_logos",
+        "url": "https://images.pexels.com/photos/21898300/pexels-photo-21898300.jpeg",
+        "description": "Pexels logo (Social Proof)"
+      },
+      {
+        "category": "sponsor_logos",
+        "url": "https://images.unsplash.com/photo-1644166186783-35d911470ff0",
+        "description": "Mercedes Benz logo (Social Proof - Enterprise)"
+      },
+      {
+        "category": "sponsor_logos",
+        "url": "https://images.unsplash.com/photo-1586867026567-b9b63ae58472",
+        "description": "Marshall logo (Social Proof)"
+      },
+      {
+        "category": "sponsor_logos",
+        "url": "https://images.unsplash.com/photo-1758560902402-0785e1ff77db",
+        "description": "Coca-Cola logo (Social Proof)"
+      }
+    ]
+  },
+  "accessibility_and_testing": {
+    "data_testid": "All interactive elements, buttons, links, and forms MUST include a role-based 'data-testid' attribute (e.g., 'hero-cta-button', 'pricing-pro-plan-button').",
+    "contrast": "Ensure minimum 4.5:1 contrast for all text over backgrounds."
+  },
+  "instructions_to_main_agent": [
+    "Install necessary icon libraries: yarn add @phosphor-icons/react",
+    "Ensure 'Outfit', 'Manrope', and 'JetBrains Mono' are imported via Google Fonts in index.html or globals.css.",
+    "Use standard HTML/Tailwind for structural bento-grid layouts. Do not use generic Shadcn Card components for the hero or primary feature grids.",
+    "Apply the styling rules exactly as mapped in this JSON.",
+    "For the sponsor logos, render them as greyscale and use mix-blend-screen or opacity adjustments so they look cohesive in the dark theme.",
+    "Use framer-motion for simple staggered entrance animations and hover effects on grid items."
+  ]
+}
