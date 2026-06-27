@@ -17,7 +17,8 @@ export const Hero = () => {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/70 to-[#030303]" />
         <div className="absolute inset-0 tech-grid opacity-[0.35]" />
-        <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[900px] h-[900px] radial-glow blur-3xl" />
+        <div className="absolute -top-40 left-1/4 -translate-x-1/2 w-[700px] h-[700px] radial-glow blur-3xl" />
+        <div className="absolute top-20 right-0 w-[520px] h-[520px] blur-3xl opacity-40" style={{ background: "radial-gradient(circle, rgba(30,167,255,0.18) 0%, transparent 60%)" }} />
       </div>
 
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
@@ -41,7 +42,7 @@ export const Hero = () => {
               Turn any idea<br />
               into a shipping app{" "}
               <span className="relative inline-block">
-                <span className="bg-gradient-to-r from-[#FF5F15] via-[#FF7A3D] to-[#FFD700] bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-[#FF5F15] via-[#FFD700] to-[#1ea7ff] bg-clip-text text-transparent">
                   in minutes
                 </span>
                 <svg
@@ -107,7 +108,14 @@ export const Hero = () => {
           </div>
 
           {/* Right: Mini console card */}
-          <div className="lg:col-span-4">
+          <div className="lg:col-span-4 relative">
+            {/* Floating logo behind console */}
+            <img
+              src="https://customer-assets.emergentagent.com/job_ai-plugin-builder-1/artifacts/mermnicj_Plugiins%20.png"
+              alt=""
+              aria-hidden="true"
+              className="absolute -top-16 -right-6 w-40 h-40 object-contain opacity-30 blur-[1px] pointer-events-none select-none rotate-12"
+            />
             <div
               data-testid="hero-console"
               className="plg-card p-6 lg:p-7 relative fade-up"

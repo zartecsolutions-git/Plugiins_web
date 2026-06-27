@@ -35,13 +35,14 @@ export const Footer = () => {
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-10 mb-16">
           <div className="col-span-2 lg:col-span-2">
-            <div className="flex items-center gap-2 mb-5">
-              <span className="relative inline-flex items-center justify-center w-8 h-8">
-                <span className="absolute inset-0 bg-[#FF5F15] rounded-[2px] rotate-45" />
-                <span className="relative font-display font-bold text-[15px] text-black">P</span>
-              </span>
+            <div className="flex items-center gap-2.5 mb-5">
+              <img
+                src="https://customer-assets.emergentagent.com/job_ai-plugin-builder-1/artifacts/mermnicj_Plugiins%20.png"
+                alt="Plugiins"
+                className="h-9 w-9 object-contain"
+              />
               <span className="font-display font-semibold text-[17px] tracking-tight text-white">
-                plugiins<span className="text-[#FF5F15]">.</span>
+                <span className="text-[#1ea7ff]">plug</span><span className="text-[#FF5F15]">iins</span><span className="text-[#FF5F15]">.</span>
               </span>
             </div>
             <p className="font-body text-sm text-zinc-500 leading-relaxed max-w-xs">
@@ -94,10 +95,10 @@ export const Footer = () => {
         <div className="relative overflow-hidden border-t border-white/[0.06] pt-12 mb-10">
           <div
             data-testid="footer-wordmark"
-            className="font-display text-white font-semibold tracking-[-0.04em] leading-none select-none"
+            className="font-display font-semibold tracking-[-0.04em] leading-none select-none"
             style={{ fontSize: "clamp(64px, 16vw, 240px)" }}
           >
-            plugiins<span className="text-[#FF5F15]">.</span>
+            <span className="text-[#1ea7ff]">plug</span><span className="text-white">iins</span><span className="text-[#FF5F15]">.</span>
           </div>
         </div>
 

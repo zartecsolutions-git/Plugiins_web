@@ -32,14 +32,15 @@ export const Navbar = () => {
         <a
           href="#top"
           data-testid="nav-logo"
-          className="flex items-center gap-2 group"
+          className="flex items-center gap-2.5 group"
         >
-          <span className="relative inline-flex items-center justify-center w-8 h-8">
-            <span className="absolute inset-0 bg-[#FF5F15] rounded-[2px] rotate-45 group-hover:rotate-[60deg] transition-transform duration-500" />
-            <span className="relative font-display font-bold text-[15px] text-black">P</span>
-          </span>
+          <img
+            src="https://customer-assets.emergentagent.com/job_ai-plugin-builder-1/artifacts/mermnicj_Plugiins%20.png"
+            alt="Plugiins"
+            className="h-9 w-9 object-contain transition-transform duration-500 group-hover:rotate-6"
+          />
           <span className="font-display font-semibold text-[17px] tracking-tight">
-            plugiins<span className="text-[#FF5F15]">.</span>
+            <span className="text-[#1ea7ff]">plug</span><span className="text-[#FF5F15]">iins</span><span className="text-[#FF5F15]">.</span>
           </span>
         </a>
 

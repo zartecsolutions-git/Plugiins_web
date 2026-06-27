@@ -50,7 +50,7 @@ export const CTA = () => {
           <span className="label-mono">/ Begin building</span>
           <h2 className="font-display text-4xl sm:text-6xl text-white mt-5 leading-[1.02] tracking-tighter font-semibold max-w-3xl mx-auto">
             What will your business{" "}
-            <span className="bg-gradient-to-r from-[#FF5F15] to-[#FFD700] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#FF5F15] via-[#FFD700] to-[#1ea7ff] bg-clip-text text-transparent">
               ship next
             </span>
             ?
